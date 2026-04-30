@@ -13,19 +13,17 @@
 - Next.js 16 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4
 - Prisma + SQLite (готово к миграции на PostgreSQL)
-- Google Gemini API (`@google/genai`)
+- Groq API
 - React Hook Form + Zod, TanStack Query
 
 ## Запуск
 
 ```bash
 npm install
-cp .env.example .env.local        # затем заполнить GEMINI_API_KEY
+cp .env.example .env.local        # затем заполнить Groq
 npm run db:push                    # создать SQLite-схему
 npm run dev                        # http://localhost:3000
 ```
-
-Получить ключ Gemini API: <https://aistudio.google.com/apikey>
 
 ## Скрипты
 
