@@ -160,9 +160,7 @@ export async function evaluateSubmission(submissionId: string): Promise<void> {
   try {
     const a = submission.assignment;
     const type = a.type as "code" | "essay" | "plagiarism";
-    const criteria = a.criteria
-      ? (JSON.parse(a.criteria) as CriterionInput[])
-      : null;
+    const criteria = a.criteria as CriterionInput[] | null;
 
     const record: SubmissionRecord = {
       id: submission.id,
@@ -196,10 +194,10 @@ export async function evaluateSubmission(submissionId: string): Promise<void> {
         data: {
           submissionId: submission.id,
           totalScore: result.totalScore,
-          criteriaScores: JSON.stringify(result.criteriaScores),
-          strengths: JSON.stringify(result.strengths),
-          weaknesses: JSON.stringify(result.weaknesses),
-          suggestions: JSON.stringify(result.suggestions),
+          criteriaScores: result.criteriaScores,
+          strengths: result.strengths,
+          weaknesses: result.weaknesses,
+          suggestions: result.suggestions,
           rawResponse: rawText,
           modelUsed: model,
         },
@@ -222,10 +220,10 @@ export async function evaluateSubmission(submissionId: string): Promise<void> {
         data: {
           submissionId: submission.id,
           totalScore: result.totalScore,
-          criteriaScores: JSON.stringify(result.criteriaScores),
-          strengths: JSON.stringify(result.strengths),
-          weaknesses: JSON.stringify(result.weaknesses),
-          suggestions: JSON.stringify(result.suggestions),
+          criteriaScores: result.criteriaScores,
+          strengths: result.strengths,
+          weaknesses: result.weaknesses,
+          suggestions: result.suggestions,
           rawResponse: rawText,
           modelUsed: model,
         },
@@ -241,7 +239,7 @@ export async function evaluateSubmission(submissionId: string): Promise<void> {
           submissionId: submission.id,
           originalityScore: result.originalityScore,
           aiProbability: result.aiProbability,
-          suspiciousFragments: JSON.stringify(result.suspiciousFragments),
+          suspiciousFragments: result.suspiciousFragments,
           plagiarismVerdict: result.verdict,
           plagiarismSummary: result.summary,
           rawResponse: rawText,

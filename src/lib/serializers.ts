@@ -9,13 +9,9 @@ import type {
   SubmissionStatus,
 } from "@/types";
 
-function parseJson<T>(value: string | null | undefined, fallback: T): T {
-  if (!value) return fallback;
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return fallback;
-  }
+function castJson<T>(value: unknown, fallback: T): T {
+  if (value === null || value === undefined) return fallback;
+  return value as T;
 }
 
 type SubmissionWithEval = {
@@ -31,18 +27,18 @@ type SubmissionWithEval = {
     description: string | null;
     type: string;
     language: string | null;
-    criteria: string | null;
+    criteria: unknown;
   };
   evaluation: {
     id: string;
     totalScore: number | null;
-    criteriaScores: string | null;
-    strengths: string | null;
-    weaknesses: string | null;
-    suggestions: string | null;
+    criteriaScores: unknown;
+    strengths: unknown;
+    weaknesses: unknown;
+    suggestions: unknown;
     originalityScore: number | null;
     aiProbability: number | null;
-    suspiciousFragments: string | null;
+    suspiciousFragments: unknown;
     plagiarismVerdict: string | null;
     plagiarismSummary: string | null;
     modelUsed: string;
@@ -75,7 +71,7 @@ export type SubmissionPayload = {
 
 export function serializeSubmission(s: SubmissionWithEval): SubmissionPayload {
   const type = s.assignment.type as AssignmentType;
-  const criteria = parseJson<Criterion[] | null>(s.assignment.criteria, null);
+  const criteria = castJson<Criterion[] | null>(s.assignment.criteria, null);
 
   let evaluation: SubmissionPayload["evaluation"] = null;
   if (s.evaluation) {
@@ -88,7 +84,7 @@ export function serializeSubmission(s: SubmissionWithEval): SubmissionPayload {
         createdAt: e.createdAt.toISOString(),
         originalityScore: e.originalityScore ?? 0,
         aiProbability: e.aiProbability ?? 0,
-        suspiciousFragments: parseJson<SuspiciousFragment[]>(e.suspiciousFragments, []),
+        suspiciousFragments: castJson<SuspiciousFragment[]>(e.suspiciousFragments, []),
         verdict: (e.plagiarismVerdict as PlagiarismVerdict) ?? "review",
         summary: e.plagiarismSummary ?? "",
       };
@@ -99,10 +95,10 @@ export function serializeSubmission(s: SubmissionWithEval): SubmissionPayload {
         modelUsed: e.modelUsed,
         createdAt: e.createdAt.toISOString(),
         totalScore: e.totalScore ?? 0,
-        criteriaScores: parseJson<CriterionScore[]>(e.criteriaScores, []),
-        strengths: parseJson<string[]>(e.strengths, []),
-        weaknesses: parseJson<string[]>(e.weaknesses, []),
-        suggestions: parseJson<string[]>(e.suggestions, []),
+        criteriaScores: castJson<CriterionScore[]>(e.criteriaScores, []),
+        strengths: castJson<string[]>(e.strengths, []),
+        weaknesses: castJson<string[]>(e.weaknesses, []),
+        suggestions: castJson<string[]>(e.suggestions, []),
       };
     }
   }

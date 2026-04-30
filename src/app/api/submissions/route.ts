@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { submissionSchema } from "@/lib/validation";
 import { scheduleEvaluation } from "@/lib/gemini/evaluator";
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
       description: input.type === "plagiarism" ? null : input.description,
       language: input.type === "code" ? input.language : null,
       criteria:
-        input.type === "plagiarism" ? null : JSON.stringify(input.criteria),
+        input.type === "plagiarism" ? Prisma.DbNull : input.criteria,
     },
   });
 

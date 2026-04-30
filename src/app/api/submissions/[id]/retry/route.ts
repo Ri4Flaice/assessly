@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { scheduleEvaluation } from "@/lib/gemini/evaluator";
 
@@ -31,7 +32,7 @@ export async function POST(
       title: original.assignment.title,
       description: original.assignment.description,
       language: original.assignment.language,
-      criteria: original.assignment.criteria,
+      criteria: original.assignment.criteria ?? Prisma.DbNull,
     },
   });
 
