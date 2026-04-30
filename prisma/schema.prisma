@@ -1,0 +1,69 @@
+// Schema интентно PG-совместимая по типам, кроме JSON-полей: SQLite не поддерживает
+// нативный Json, поэтому JSON-данные хранятся как String. При миграции на PostgreSQL
+// поменяйте provider на "postgresql" и тип этих полей на Json (см. комментарии "JSON:").
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String?
+  description String?
+  type        String   // "code" | "essay" | "plagiarism"
+  language    String?  // python, typescript, java, ...
+  criteria    String?  // JSON: [{ name, weight, description }]
+  createdAt   DateTime @default(now())
+
+  submissions Submission[]
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  content      String
+  fileName     String?
+  deviceId     String?
+  status       String   // "pending" | "processing" | "done" | "failed"
+  errorMessage String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  evaluation   Evaluation?
+
+  @@index([deviceId, createdAt])
+  @@index([assignmentId])
+}
+
+model Evaluation {
+  id           String   @id @default(cuid())
+  submissionId String   @unique
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  // Поля для code/essay
+  totalScore     Float?
+  criteriaScores String?  // JSON: [{ name, score, max, comment }]
+  strengths      String?  // JSON: string[]
+  weaknesses     String?  // JSON: string[]
+  suggestions    String?  // JSON: string[]
+
+  // Поля для plagiarism
+  originalityScore    Float?
+  aiProbability       Float?
+  suspiciousFragments String?  // JSON: [{ quote, reason }]
+  plagiarismVerdict   String?  // "clean" | "review" | "plagiarism"
+  plagiarismSummary   String?
+
+  rawResponse String?  // JSON
+  modelUsed   String
+
+  createdAt DateTime @default(now())
+}
